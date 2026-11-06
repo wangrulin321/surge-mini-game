@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c1118" />
+    <title>球潮 SURGE | 生存原型</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="hud">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">+</span>
+          <div>
+            <h1>球潮 <span>SURGE</span></h1>
+          </div>
+        </div>
+        <div class="hud-stats" aria-label="游戏数据">
+          <div class="stat-block">
+            <span class="stat-label">生存</span>
+            <strong id="time-value">00:00</strong>
+          </div>
+          <div class="stat-block">
+            <span class="stat-label">聚合</span>
+            <strong id="merge-value">0</strong>
+          </div>
+          <div class="stat-block threat-stat">
+            <span class="stat-label">威胁</span>
+            <strong id="threat-value">低</strong>
+          </div>
+        </div>
+        <button class="sound-button" id="sound-toggle" type="button" aria-label="切换声音" aria-pressed="true">
+          <span class="sound-icon" aria-hidden="true">◖</span>
+          <span class="sound-text">声音</span>
+        </button>
+      </header>
+
+      <section class="arena-wrap">
+        <div class="arena-head">
+          <div class="arena-intro">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span>生存场 · 01</span>
+          </div>
+          <div class="arena-tip" id="arena-tip">把小球引到一起，再找空隙穿出去</div>
+        </div>
+        <div class="arena-frame">
+          <canvas id="game-canvas" aria-label="球潮游戏竞技场"></canvas>
+          <div class="canvas-vignette" aria-hidden="true"></div>
+          <div class="center-prompt" id="center-prompt" aria-live="polite"></div>
+          <div class="pickup-toast" id="pickup-toast" aria-live="polite"></div>
+
+          <div class="start-screen" id="start-screen">
+            <div class="start-kicker">KEEP MOVING</div>
+            <h2>不要让球潮<br /><em>碰到你</em></h2>
+            <p>你越远，追兵越快。把它们聚成大球，利用道具撕开缺口。</p>
+            <div class="rules-brief" aria-label="游玩规则">
+              <div class="rules-brief-title">规则速览</div>
+              <ol>
+                <li>小球会自动追踪你，距离越远移动越快。</li>
+                <li>敌球彼此碰撞会融合，融合后体积和速度都会增加。</li>
+                <li>没有护盾时，任何敌球碰到你都会结束本局。</li>
+                <li>碰到效果球会立即触发它的能力，效果球会缓慢随机移动并在边缘反弹。</li>
+                <li>攻击道具可以击破敌球，大球被击破会爆出少量小球。</li>
+                <li>护卫环永久旋转，但每击败一个敌人会消耗一个护卫球。</li>
+              </ol>
+            </div>
+            <button class="primary-button" id="start-button" type="button">
+              <span>开始生存</span><span aria-hidden="true">→</span>
+            </button>
+            <div class="control-note"><span class="keycap">WASD</span><span>或</span><span class="keycap">方向键</span><span>移动 · 手机拖动屏幕</span></div>
+          </div>
+
+          <div class="game-over-screen is-hidden" id="game-over-screen">
+            <div class="start-kicker">RUN ENDED</div>
+            <h2>球潮抓住你了</h2>
+            <div class="result-grid">
+              <div><span>生存时间</span><strong id="final-time">00:00</strong></div>
+              <div><span>聚合次数</span><strong id="final-merge">0</strong></div>
+              <div><span>最终得分</span><strong id="final-score">0</strong></div>
+            </div>
+            <button class="primary-button" id="restart-button" type="button">
+              <span>再来一局</span><span aria-hidden="true">↻</span>
+            </button>
+            <p class="small-note">每一局都会重新洗牌道具和出生点</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-dock">
+        <div class="dock-section inventory-section">
+          <div class="section-label-row">
+            <span class="section-label">本局道具</span>
+            <span class="section-hint">碰到即触发</span>
+          </div>
+          <div class="item-list" id="item-list">
+            <div class="empty-item"><span class="empty-ring"></span><span>场上会出现道具</span></div>
+          </div>
+        </div>
+        <div class="dock-section rules-section">
+          <div class="section-label-row">
+            <span class="section-label">玩法信号</span>
+            <span class="section-hint">第一版规则</span>
+          </div>
+          <div class="rule-list">
+            <div class="rule-line"><span class="rule-dot player-dot"></span><span>你</span><span class="rule-description">白色核心，无防护时碰撞结束</span></div>
+            <div class="rule-line"><span class="rule-dot enemy-dot"></span><span>球潮</span><span class="rule-description">大球更快，击破会爆出小球</span></div>
+            <div class="rule-line"><span class="rule-dot power-dot"></span><span>攻击道具</span><span class="rule-description">追踪弹 / 环刃 / 连锁电弧</span></div>
+            <div class="rule-line"><span class="rule-dot power-dot"></span><span>防御道具</span><span class="rule-description">毒雾尾迹 / 护卫环</span></div>
+          </div>
+        </div>
+        <div class="dock-section status-section">
+          <div class="section-label-row">
+            <span class="section-label">状态</span>
+            <span class="section-hint" id="spawn-status">等待开始</span>
+          </div>
+          <div class="status-copy" id="status-copy">先观察出生点，移动起来后再调整路线。</div>
+          <div class="status-bar"><span id="status-bar-fill"></span></div>
+        </div>
+      </section>
+    </main>
+    <script src="game.js" defer></script>
+  </body>
+</html>
